@@ -22,6 +22,24 @@ extern "C" {
 #endif
 
 #include <inttypes.h>
+#include <stddef.h>
+
+// Maximum number of bytes (including the terminating NUL) that the buffered
+// functions may write to result. The *_buffered_n functions return the number
+// of characters written, excluding the terminating NUL; the *_buffered
+// functions additionally write a terminating NUL. Use these constants to size
+// the result buffer, e.g.:
+//   char buffer[RYU_D2S_BUFFER_SIZE];
+//   d2s_buffered(f, buffer);
+#define RYU_D2S_BUFFER_SIZE 25
+#define RYU_F2S_BUFFER_SIZE 16
+// d2fixed prints at most 309 integer digits (for the largest finite double),
+// plus an optional sign, an optional decimal point, and the terminating NUL.
+#define RYU_D2FIXED_BUFFER_SIZE(precision) ((size_t) (precision) + 312)
+// d2exp prints one integer digit, an optional decimal point, precision
+// fractional digits, and an exponent of the form e±XXX, plus the NUL. Special
+// values need up to 11 bytes ("-nan(snan)" plus NUL on MSVC).
+#define RYU_D2EXP_BUFFER_SIZE(precision) ((size_t) (precision) + 11)
 
 int d2s_buffered_n(double f, char* result);
 void d2s_buffered(double f, char* result);
