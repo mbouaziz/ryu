@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ryu VERSION 2.0 LANGUAGES C)
+project(ryu VERSION 2.0 LANGUAGES C CXX)
 include(GNUInstallDirs)
 
 # ryu library
@@ -49,4 +49,31 @@ if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang"
     set(RYU_GENERIC_128_AVAILABLE ON CACHE BOOL "generic_128 available." FORCE)
 else()
     set(RYU_GENERIC_128_AVAILABLE OFF CACHE BOOL "generic_128 not available on this platform." FORCE)
+endif()
+
+# Benchmarks, built with -DRYU_BUILD_BENCHMARKS=ON (off by default). These
+# need POSIX headers, so they are skipped on Windows.
+option(RYU_BUILD_BENCHMARKS "Build the ryu benchmarks" OFF)
+if (RYU_BUILD_BENCHMARKS AND NOT WIN32)
+    add_library(mersenne STATIC third_party/mersenne/random.c)
+    target_include_directories(mersenne PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third_party/mersenne)
+
+    add_executable(ryu_printf_benchmark_c ryu/benchmark/benchmark_fixed.c)
+    target_include_directories(ryu_printf_benchmark_c PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(ryu_printf_benchmark_c PRIVATE ryu mersenne m)
+
+    add_library(double-conversion STATIC
+            third_party/double-conversion/double-conversion/bignum.cc
+            third_party/double-conversion/double-conversion/bignum-dtoa.cc
+            third_party/double-conversion/double-conversion/cached-powers.cc
+            third_party/double-conversion/double-conversion/diy-fp.cc
+            third_party/double-conversion/double-conversion/double-conversion.cc
+            third_party/double-conversion/double-conversion/fast-dtoa.cc
+            third_party/double-conversion/double-conversion/fixed-dtoa.cc
+            third_party/double-conversion/double-conversion/strtod.cc)
+    target_include_directories(double-conversion PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third_party/double-conversion)
+
+    add_executable(ryu_benchmark ryu/benchmark/benchmark.cc)
+    target_include_directories(ryu_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_link_libraries(ryu_benchmark PRIVATE ryu double-conversion m)
 endif()
