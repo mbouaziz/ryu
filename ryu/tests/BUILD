@@ -64,6 +64,16 @@ cc_test(
 )
 
 cc_test(
+    name = "roundtrip_test",
+    srcs = ["roundtrip_test.cc"],
+    deps = [
+        "//ryu",
+        "//ryu:ryu_parse",
+        "//third_party/gtest",
+    ],
+)
+
+cc_test(
     name = "ryu_printf_test",
     srcs = ["d2fixed_test.cc"],
     deps = [
