@@ -323,7 +323,7 @@ int f2s_buffered_n(float f, char* result) {
   const uint32_t ieeeExponent = (bits >> FLOAT_MANTISSA_BITS) & ((1u << FLOAT_EXPONENT_BITS) - 1);
 
   // Case distinction; exit early for the easy cases.
-  if (ieeeExponent == ((1u << FLOAT_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0)) {
+  if (RYU_UNLIKELY(ieeeExponent == ((1u << FLOAT_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0))) {
     return copy_special_str(result, ieeeSign, ieeeExponent, ieeeMantissa);
   }
 

@@ -371,10 +371,10 @@ int d2fixed_buffered_n(double d, uint32_t precision, char* result) {
   const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
 
   // Case distinction; exit early for the easy cases.
-  if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u)) {
+  if (RYU_UNLIKELY(ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u))) {
     return copy_special_str_printf(result, ieeeSign, ieeeMantissa);
   }
-  if (ieeeExponent == 0 && ieeeMantissa == 0) {
+  if (RYU_UNLIKELY(ieeeExponent == 0 && ieeeMantissa == 0)) {
     int index = 0;
     if (ieeeSign) {
       result[index++] = '-';
@@ -579,10 +579,10 @@ int d2exp_buffered_n(double d, uint32_t precision, char* result) {
   const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
 
   // Case distinction; exit early for the easy cases.
-  if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u)) {
+  if (RYU_UNLIKELY(ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u))) {
     return copy_special_str_printf(result, ieeeSign, ieeeMantissa);
   }
-  if (ieeeExponent == 0 && ieeeMantissa == 0) {
+  if (RYU_UNLIKELY(ieeeExponent == 0 && ieeeMantissa == 0)) {
     int index = 0;
     if (ieeeSign) {
       result[index++] = '-';

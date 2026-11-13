@@ -207,7 +207,7 @@ static inline floating_decimal_64 d2d(const uint64_t ieeeMantissa, const uint32_
   uint8_t lastRemovedDigit = 0;
   uint64_t output;
   // On average, we remove ~2 digits.
-  if (vmIsTrailingZeros || vrIsTrailingZeros) {
+  if (RYU_UNLIKELY(vmIsTrailingZeros || vrIsTrailingZeros)) {
     // General case, which happens rarely (~0.7%).
     for (;;) {
       const uint64_t vpDiv10 = div10(vp);
@@ -468,7 +468,7 @@ int d2s_buffered_n(double f, char* result) {
   const uint64_t ieeeMantissa = bits & ((1ull << DOUBLE_MANTISSA_BITS) - 1);
   const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
   // Case distinction; exit early for the easy cases.
-  if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0)) {
+  if (RYU_UNLIKELY(ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0))) {
     return copy_special_str(result, ieeeSign, ieeeExponent, ieeeMantissa);
   }
 
