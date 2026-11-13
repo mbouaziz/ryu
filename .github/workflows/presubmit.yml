@@ -63,3 +63,24 @@ jobs:
         bazel run -c opt --copt=-DRYU_OPTIMIZE_SIZE //ryu/benchmark:ryu_printf_benchmark -- -samples=200
         bazel run -c opt --copt=-DRYU_OPTIMIZE_SIZE --copt=-DRYU_ONLY_64_BIT_OPS //ryu/benchmark:ryu_benchmark
         bazel run -c opt --copt=-DRYU_OPTIMIZE_SIZE --copt=-DRYU_ONLY_64_BIT_OPS //ryu/benchmark:ryu_printf_benchmark -- -samples=200
+
+  # Build and run the C/C++ tests with CMake/CTest, including a sanitizer run.
+  cmake-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build and test with CMake
+      run: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --parallel
+        ctest --test-dir build --output-on-failure
+
+    - name: Build and test with CMake and sanitizers
+      run: |
+        cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+        cmake --build build-asan --parallel
+        ctest --test-dir build-asan --output-on-failure
