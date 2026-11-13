@@ -201,6 +201,29 @@ You can run both C and Java tests with
 $ bazel test //ryu/... //src/...
 ```
 
+### Building and testing with CMake
+Alternatively, use CMake (3.10 or later):
+```
+$ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build
+$ ctest --test-dir build --output-on-failure
+```
+This builds the `ryu`, `ryu_parse`, and (where the compiler supports
+`__uint128_t`) `generic_128` libraries and runs the C/C++ tests with CTest.
+Pass `-DRYU_BUILD_TESTS=OFF` to skip the tests, and
+`-DRYU_BUILD_BENCHMARKS=ON` to also build the `ryu_benchmark` and
+`ryu_printf_benchmark_c` benchmark binaries.
+
+### Buffer sizes
+The `d2s_buffered_n()`, `f2s_buffered_n()`, `d2fixed_buffered_n()`, and
+`d2exp_buffered_n()` functions (and their `*_buffered` variants, which
+additionally write a terminating NUL) write at most `RYU_D2S_BUFFER_SIZE`,
+`RYU_F2S_BUFFER_SIZE`, `RYU_D2FIXED_BUFFER_SIZE(precision)`, and
+`RYU_D2EXP_BUFFER_SIZE(precision)` bytes, respectively; the macros are
+defined in `ryu/ryu.h`. The non-buffered `d2s()`, `f2s()`, `d2fixed()`, and
+`d2exp()` functions allocate a buffer of the appropriate size, return it
+(caller frees with `free()`), and return NULL on allocation failure.
+
 
 
 ## Ryu: Additional Notes
