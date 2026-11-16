@@ -50,3 +50,13 @@ if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang"
 else()
     set(RYU_GENERIC_128_AVAILABLE OFF CACHE BOOL "generic_128 not available on this platform." FORCE)
 endif()
+
+# Parse tests; require the ryu_parse target (added in a separate change)
+# and the test harness above, so this block is skipped until both land.
+if (RYU_BUILD_TESTS AND TARGET ryu_parse)
+    foreach(test s2d_test s2f_test roundtrip_test)
+        add_executable(${test} ryu/tests/${test}.cc)
+        target_link_libraries(${test} PRIVATE ryu ryu_parse gtest_main)
+        add_test(NAME ${test} COMMAND ${test})
+    endforeach()
+endif()
