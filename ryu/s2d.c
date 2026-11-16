@@ -41,12 +41,25 @@
 #define DOUBLE_EXPONENT_BITS 11
 #define DOUBLE_EXPONENT_BIAS 1023
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(_M_X64)
 #include <intrin.h>
 
 static inline uint32_t floor_log2(const uint64_t value) {
   long index;
   return _BitScanReverse64(&index, value) ? index : 64;
+}
+
+#elif defined(_MSC_VER)
+// _BitScanReverse64 does not exist on 32-bit x86 MSVC (issue #242); scan
+// the two 32-bit halves separately instead.
+#include <intrin.h>
+
+static inline uint32_t floor_log2(const uint64_t value) {
+  unsigned long index;
+  if ((value >> 32) != 0) {
+    return _BitScanReverse(&index, (unsigned long) (value >> 32)) ? 32 + (uint32_t) index : 64;
+  }
+  return _BitScanReverse(&index, (unsigned long) value) ? (uint32_t) index : 64;
 }
 
 #else
