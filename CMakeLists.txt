@@ -3,7 +3,7 @@ project(ryu VERSION 2.0 LANGUAGES C)
 include(GNUInstallDirs)
 
 # ryu library
-add_library(ryu
+add_library(ryu STATIC
         ryu/f2s.c
         ryu/f2s_full_table.h
         ryu/f2s_intrinsics.h
@@ -27,6 +27,25 @@ add_library(ryu::ryu ALIAS ryu)
 install(TARGETS ryu LIBRARY)
 install(FILES ryu/ryu.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ryu)
 
+# ryu_parse library (string to float parsing)
+add_library(ryu_parse STATIC
+        ryu/s2d.c
+        ryu/s2f.c
+        ryu/ryu_parse.h
+        ryu/common.h
+        ryu/d2s_full_table.h
+        ryu/d2s_small_table.h
+        ryu/d2s_intrinsics.h
+        ryu/f2s_full_table.h
+        ryu/f2s_intrinsics.h)
+
+target_include_directories(ryu_parse PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+
+add_library(ryu::ryu_parse ALIAS ryu_parse)
+
+install(TARGETS ryu_parse LIBRARY)
+install(FILES ryu/ryu_parse.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ryu)
+
 
 # generic_128
 # Only builds on GCC/Clang/Intel/IntelLLVM due to __uint128_t. No MSVC.
@@ -34,7 +53,7 @@ if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang"
         OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
         OR "${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
 
-    add_library(generic_128
+    add_library(generic_128 STATIC
             ryu/generic_128.c
             ryu/generic_128.h
             ryu/ryu_generic_128.h)
