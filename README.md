@@ -201,6 +201,16 @@ You can run both C and Java tests with
 $ bazel test //ryu/... //src/...
 ```
 
+### Building and testing with CMake
+Alternatively, use CMake (3.10 or later):
+```
+$ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build
+$ ctest --test-dir build --output-on-failure
+```
+This builds the libraries and runs the C/C++ tests with CTest.
+Pass `-DRYU_BUILD_TESTS=OFF` to skip the tests.
+
 
 
 ## Ryu: Additional Notes
