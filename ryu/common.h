@@ -25,6 +25,16 @@
 #define RYU_32_BIT_PLATFORM
 #endif
 
+// Branch prediction hints for cold/hot paths. Compilers that support
+// __builtin_expect use it; otherwise the macros are no-ops.
+#if defined(__GNUC__) || defined(__clang__)
+#define RYU_LIKELY(x) (__builtin_expect(!!(x), 1))
+#define RYU_UNLIKELY(x) (__builtin_expect(!!(x), 0))
+#else
+#define RYU_LIKELY(x) (x)
+#define RYU_UNLIKELY(x) (x)
+#endif
+
 // Returns the number of decimal digits in v, which must not contain more than 9 digits.
 static inline uint32_t decimalLength9(const uint32_t v) {
   // Function precondition: v is not a 10-digit number.
